@@ -1,17 +1,58 @@
 package com.example.android.firebasearraytest;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
+    TextView mArrayContentsTextView;
+    EditText mPushItemEditText;
+    Firebase mFirebase;
+
+    public static final String FIREBASE_URL = "https://testingarray.firebaseio.com/";
+    public static final String FIREBASE_MESSAGE_PATH = "messages";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mArrayContentsTextView = (TextView) findViewById(R.id.array_contents);
+        mPushItemEditText = (EditText) findViewById(R.id.to_push);
+        Firebase.setAndroidContext(this);
+        mFirebase = new Firebase(FIREBASE_URL).child(FIREBASE_MESSAGE_PATH);
+        mFirebase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+
+                    //mArrayContentsTextView.setText(dataSnapshot.getValue().toString());
+
+
+                    /*String messages = "";
+                    Map<String, String> map = dataSnapshot.getValue(Map.class);
+                    for (String message : map.values()) {
+                        messages += message + "\n";
+                    }
+                    mArrayContentsTextView.setText(messages);*/
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
     }
 
     @Override
@@ -34,5 +75,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onPushClicked(View view) {
+        mFirebase.push().setValue(mPushItemEditText.getText().toString());
+
     }
 }
