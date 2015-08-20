@@ -18,8 +18,25 @@
         android:onClick="onPushClicked"/>
 
     <TextView
+        android:id="@+id/push_contents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/to_array"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Text to Push"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add it To Array"
+        android:onClick="onArrayClicked"/>
+
+    <TextView
         android:id="@+id/array_contents"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
 
 </LinearLayout>

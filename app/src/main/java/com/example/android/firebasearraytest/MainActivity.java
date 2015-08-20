@@ -13,6 +13,9 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,15 +38,28 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
 
-                    //mArrayContentsTextView.setText(dataSnapshot.getValue().toString());
+                    /*mArrayContentsTextView.setText(dataSnapshot.getValue().toString());*/
 
 
-                    /*String messages = "";
+                    //i don't know what order things are getting put in
+                   /* String messages = "";
                     Map<String, String> map = dataSnapshot.getValue(Map.class);
                     for (String message : map.values()) {
                         messages += message + "\n";
                     }
                     mArrayContentsTextView.setText(messages);*/
+
+                    //TreeMap - will sort by the key, so will be by order
+                    String messages = "";
+                    Map<String, String> map = dataSnapshot.getValue(Map.class);
+                    TreeMap<String,String> treeMap = new TreeMap<String, String>(map);
+                    for (String message : treeMap.values()) {
+                        messages += message + "\n";
+                    }
+                    mArrayContentsTextView.setText(messages);
+
+
+
                 }
             }
 
