@@ -13,32 +13,39 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView mArrayContentsTextView;
+    TextView mPushContentsTextView;
     EditText mPushItemEditText;
     Firebase mFirebase;
 
+    TextView mArrayContentsTextView;
+    EditText mArrayItemEditText;
+
+    ArrayList<String> mArrayList;
+
     public static final String FIREBASE_URL = "https://testingarray.firebaseio.com/";
     public static final String FIREBASE_MESSAGE_PATH = "messages";
+    public static final String FIREBASE_ARRAY_PATH = "messages_array";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mArrayContentsTextView = (TextView) findViewById(R.id.array_contents);
+        mPushContentsTextView = (TextView) findViewById(R.id.push_contents);
         mPushItemEditText = (EditText) findViewById(R.id.to_push);
         Firebase.setAndroidContext(this);
         mFirebase = new Firebase(FIREBASE_URL).child(FIREBASE_MESSAGE_PATH);
-        mFirebase.addValueEventListener(new ValueEventListener() {
+
+        //mFirebase.addValueEventListener(new ValueEventListener() {
+        mFirebase.orderByValue().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
 
-                    /*mArrayContentsTextView.setText(dataSnapshot.getValue().toString());*/
+                    /*mPushContentsTextView.setText(dataSnapshot.getValue().toString());*/
 
 
                     //i don't know what order things are getting put in
@@ -47,19 +54,48 @@ public class MainActivity extends AppCompatActivity {
                     for (String message : map.values()) {
                         messages += message + "\n";
                     }
-                    mArrayContentsTextView.setText(messages);*/
+                    mPushContentsTextView.setText(messages);*/
+
+
+                    //Linked Hash Map Does nothing
+                    /*String messages = "";
+                    Map<String, String> map = dataSnapshot.getValue(Map.class);
+                    LinkedHashMap<String,String> linkedHashMap = new LinkedHashMap<String, String>(map);
+                    for (String message : linkedHashMap.values()) {
+                        messages += message + "\n";
+                    }
+                    mPushContentsTextView.setText(messages);*/
+
 
                     //TreeMap - will sort by the key, so will be by order
-                    String messages = "";
+                    /*String messages = "";
                     Map<String, String> map = dataSnapshot.getValue(Map.class);
                     TreeMap<String,String> treeMap = new TreeMap<String, String>(map);
                     for (String message : treeMap.values()) {
                         messages += message + "\n";
                     }
-                    mArrayContentsTextView.setText(messages);
+                    mPushContentsTextView.setText(messages);*/
 
 
+                }
+            }
 
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+
+        mArrayList = new ArrayList<>();
+        mArrayContentsTextView = (TextView)findViewById(R.id.array_contents);
+        mArrayItemEditText = (EditText)findViewById(R.id.to_array);
+        mFirebase.child(FIREBASE_ARRAY_PATH).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null ) {
+                    mArrayContentsTextView.setText(dataSnapshot.getValue().toString());
+                    mArrayList = dataSnapshot.getValue(ArrayList.class);
                 }
             }
 
@@ -95,6 +131,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPushClicked(View view) {
         mFirebase.push().setValue(mPushItemEditText.getText().toString());
+
+    }
+
+    public void onArrayClicked(View view) {
+        //Good, but you could easily overwrite someone's array
+        mArrayList.add(mArrayItemEditText.getText().toString());
+        mFirebase.child(FIREBASE_ARRAY_PATH).setValue(mArrayList);
 
     }
 }
