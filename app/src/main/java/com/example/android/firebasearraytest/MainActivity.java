@@ -2,8 +2,6 @@ package com.example.android.firebasearraytest;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> mArrayList;
 
+    // TODO Make a new app and put its URL here
     public static final String FIREBASE_URL = "https://testingarray.firebaseio.com/";
-    public static final String FIREBASE_MESSAGE_PATH = "messages";
+    public static final String FIREBASE_MESSAGE_PATH = "messages_push";
     public static final String FIREBASE_ARRAY_PATH = "messages_array";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,19 +36,21 @@ public class MainActivity extends AppCompatActivity {
         mPushContentsTextView = (TextView) findViewById(R.id.push_contents);
         mPushItemEditText = (EditText) findViewById(R.id.to_push);
         Firebase.setAndroidContext(this);
-        mFirebase = new Firebase(FIREBASE_URL).child(FIREBASE_MESSAGE_PATH);
+        mFirebase = new Firebase(FIREBASE_URL);
 
-        //mFirebase.addValueEventListener(new ValueEventListener() {
-        mFirebase.orderByValue().addValueEventListener(new ValueEventListener() {
+        /**
+         * This is the code to display what's in the list key'd with push IDs
+         */
+        mFirebase.child(FIREBASE_MESSAGE_PATH).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
 
-                    /*mPushContentsTextView.setText(dataSnapshot.getValue().toString());*/
+                    /* This prints out a "default" ordering of what's in the database*/
+                    mPushContentsTextView.setText(dataSnapshot.getValue().toString());
 
-
-                    //i don't know what order things are getting put in
-                   /* String messages = "";
+                    /* This tries to take the code out as a simple Map */
+                    /* String messages = "";
                     Map<String, String> map = dataSnapshot.getValue(Map.class);
                     for (String message : map.values()) {
                         messages += message + "\n";
@@ -57,17 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     mPushContentsTextView.setText(messages);*/
 
 
-                    //Linked Hash Map Does nothing
-                    /*String messages = "";
-                    Map<String, String> map = dataSnapshot.getValue(Map.class);
-                    LinkedHashMap<String,String> linkedHashMap = new LinkedHashMap<String, String>(map);
-                    for (String message : linkedHashMap.values()) {
-                        messages += message + "\n";
-                    }
-                    mPushContentsTextView.setText(messages);*/
-
-
-                    //TreeMap - will sort by the key, so will be by order
+                    /* Try turning the code into a TreeMap to see what it does to ordering */
                     /*String messages = "";
                     Map<String, String> map = dataSnapshot.getValue(Map.class);
                     TreeMap<String,String> treeMap = new TreeMap<String, String>(map);
@@ -76,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     mPushContentsTextView.setText(messages);*/
 
-
+                } else {
+                    mPushContentsTextView.setText("");
                 }
             }
 
@@ -90,12 +82,20 @@ public class MainActivity extends AppCompatActivity {
         mArrayList = new ArrayList<>();
         mArrayContentsTextView = (TextView)findViewById(R.id.array_contents);
         mArrayItemEditText = (EditText)findViewById(R.id.to_array);
+        /**
+         * This is the code to display what's in the ArrayList that was pushed to Firebase
+         */
         mFirebase.child(FIREBASE_ARRAY_PATH).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null ) {
-                    mArrayContentsTextView.setText(dataSnapshot.getValue().toString());
+                    /* Grabs the ArrayList from Firebase and prints out its' contents in order */
+                    String arrayList = "";
                     mArrayList = dataSnapshot.getValue(ArrayList.class);
+                    for(String item : mArrayList) {
+                        arrayList += item + "\n";
+                    }
+                    mArrayContentsTextView.setText(arrayList);
                 }
             }
 
@@ -107,35 +107,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void onPushClicked(View view) {
-        mFirebase.push().setValue(mPushItemEditText.getText().toString());
+    public void onPushItToFirebaseClicked(View view) {
+        /* Pushes the message the user put to the database */
+        mFirebase.child(FIREBASE_MESSAGE_PATH).push().setValue(mPushItemEditText.getText().toString());
 
     }
 
-    public void onArrayClicked(View view) {
-        //Good, but you could easily overwrite someone's array
+    public void onAddItToArrayClicked(View view) {
+        /* Add the message the user put to a growing array list and then push
+        the ArrayList to Firebase. */
         mArrayList.add(mArrayItemEditText.getText().toString());
         mFirebase.child(FIREBASE_ARRAY_PATH).setValue(mArrayList);
 

@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Push it to Firebase"
-        android:onClick="onPushClicked"/>
+        android:onClick="onPushItToFirebaseClicked"/>
 
     <TextView
         android:id="@+id/push_contents"
@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add it To Array"
-        android:onClick="onArrayClicked"/>
+        android:onClick="onAddItToArrayClicked"/>
 
     <TextView
         android:id="@+id/array_contents"

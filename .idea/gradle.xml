@@ -8,8 +8,8 @@
         <option name="gradleJvm" value="1.8" />
         <option name="modules">
           <set>
-            <option value="$USER_HOME$/Documents/Udacity/Courses/Firebase/PlayingAround/FirebaseArrayTest" />
-            <option value="$USER_HOME$/Documents/Udacity/Courses/Firebase/PlayingAround/FirebaseArrayTest/app" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
       </GradleProjectSettings>
